@@ -15,8 +15,8 @@
     <div class="container">
         <div class="py-5 text-center">
             <h1>Police Data Accessibility Project</h1>
-            <h2>Data Intake Mapping</h2>
-            <p class="lead">Fill out the form below to generate a proper CSV to add a new dataset! Use the id for data intake!</p>
+            <h2>Scraper Schema.json Generator</h2>
+            <p class="lead">Fill out the form below to generate a <span class="badge bg-dark">schema.json</span> file for the Scrapers repo!</p>
         </div>
         <div class="row">
             <div class="col-6">
@@ -37,10 +37,71 @@
                         <label for="agencies" class="form-label">Agency:</label>
                         <div class="input-group">
                             <select  class="form-select" id='agencies'>
-            
+                                <option selected disabled>Choose a state first!</option>
                             </select>
                         </div>
                     </div> <!-- end col -->
+                    <div id="agency-info">
+                        <div class="row">
+                            <div class="col-6">
+                                <label for="agencies" class="form-label">Latitude:</label>
+                                <div class="input-group">
+                                    <input class="form-control" id="agency_lat" />
+                                </div>
+                            </div><!-- end col -->
+                            <div class="col-6">
+                                <label for="agencies" class="form-label">Longitude:</label>
+                                <div class="input-group">
+                                    <input class="form-control" id="agency_lng" />
+                                </div>
+                            </div><!-- end col -->
+                        </div> <!-- end location row -->
+                        <div class="row">
+                            <div class="col-12">
+                                <label for="agencies" class="form-label">Agency Type:</label>
+                                <div class="input-group">
+                                    <select class="form-select" id='agency_type'>
+                                        {% for type in agency_types %}
+                                            <option  value="{{type.id}}"> <b> {{type.id}} </b> - {{type.name}} </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div><!-- end col -->
+                        </div> <!-- end agency type -->
+                        <div class="row">
+                            <div class="col-6">
+                                <label for="agencies" class="form-label">City:</label>
+                                <div class="input-group">
+                                    <input class="form-control" id="agency_city" />
+                                </div>
+                            </div><!-- end col -->
+                            <div class="col-6">
+                                <label for="agencies" class="form-label">State:</label>
+                                <div class="input-group">
+                                    <select class="form-select" id='agency_state'>
+                                        {% for state in states %}
+                                            <option  value="{{state.name_iso}}"> <b> {{state.name_iso}} </b> - {{state.name}} </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div><!-- end col -->
+                        </div> <!-- end city state row -->
+                        <div class="row">
+                            <div class="col-6">
+                                <label for="agencies" class="form-label">ZIP Code:</label>
+                                <div class="input-group">
+                                    <input class="form-control" id="agency_zip" />
+                                </div>
+                            </div><!-- end col -->
+                            <div class="col-6">
+                                <label for="agencies" class="form-label">FIPS: </label>
+                                <div class="input-group">
+                                    <input class="form-control" id="agency_fips" />
+                                </div>
+                                <button id="fcc_get" class="btn btn-sm btn-success">Derive FIPS from Lat & Lng</button>
+                            </div><!-- end col -->
+                        </div> <!-- end city state row -->
+                    </div> <!-- end agency info-->
                 </div> <!-- end form row -->
                 <br />
                 <h3 class="mb-3">Dataset Information</h3>
@@ -106,16 +167,35 @@
             </div>
             <div class="col-6">
                 <h3 class="mb-3">Output</h3>
+                <!--The <pre> block takes spaces into effect, so we need to ensure it's not indented with the html-->
                 <pre class="chroma bg-dark text-white rounded-2 p-3">
-==============
-Datasets Table
-==============
-<span>id: <span id="output_id"></span></span>
-<span>source_type_id: <span id="output_st"></span></span>
-<span>data_types_id: <span id="output_dt"></span></span>
-<span>format_types_id: <span id="output_ft"></span></span>
-<span>agency_id: <span id="output_agency"></span></span>
-<span>update_frequency: <span id="output_uf"></span></span>
+{
+    "agency_id": "<span id="output_agency"></span>",
+    "agency_info":{
+        "agency_name":"<span id="output_agency_name"></span>",
+        "agency_coords":{"lat": "<span id="output_agency_lat"></span>", "lng":"<span id="output_agency_lng"></span>"},
+        "agency_type": <span id="output_agency_type"></span>,
+        "city": "<span id="output_agency_city"></span>",
+        "state": "<span id="output_agency_state"></span>",
+        "zip":"<span id="output_agency_zip"></span>",
+        "county_fips":"<span id="output_agency_fips"></span>"
+    },
+    "data": [
+        {
+            "dataset_id": "<span id="output_id"></span>",
+            "url":"<span id="output_url"></span>",
+            "full_data_location":"<span id="output_data"></span>",
+            "source_type": <span id="output_st"></span>,
+            "data_type": <span id="output_dt"></span>,
+            "format_type": <span id="output_ft"></span>,
+            "update_frequency": <span id="output_uf"></span>,
+            "mapping":[
+            ]
+        }
+    ]
+    
+}
+                    
                 </pre>
             </div>
         </div>
@@ -134,9 +214,9 @@ Datasets Table
         // add the agencies to the drop down
         $.each(agencies, function(key, agency){
             agency_list[agency.id] = agency;
-            //console.log(agency);
             $('#agencies').append('<option value="'+agency.id+'">'+agency.name+'</option>');
         });  
+        console.log(agency_list)
     }
 
     function populate_datasets(datasets){
@@ -164,6 +244,7 @@ Datasets Table
 
     $(document).ready(function(){
         $('#new_dataset').hide();
+        $('#agency-info').hide();
         $('#states').change(function(){
             
             $.get('ajax/get_agencies/'+ $('#states').val() + '/', function (data){
@@ -174,7 +255,17 @@ Datasets Table
         });
 
         $('#agencies').change(function(){
+            $('#agency-info').show();
+            // load the stuff to the schema.json and fields
             $('#output_agency').text($(this).val());
+            $('#agency_lat').val(agency_list[$('#agencies').val()].lat).trigger("input");
+            $('#agency_lng').val(agency_list[$('#agencies').val()].lng).trigger("input");
+            $('#agency_type').val(agency_list[$('#agencies').val()].agency_type).change();
+            $('#agency_city').val(agency_list[$('#agencies').val()].city).trigger("input");
+            $('#agency_state').val(agency_list[$('#agencies').val()].state_iso).change();
+            $('#agency_zip').val(agency_list[$('#agencies').val()].zip).trigger("input");
+            $('#agency_fips').val(agency_list[$('#agencies').val()].county_fips).trigger("input");
+            $('#output_agency_name').text($('#agencies option:selected').text());
             $.get('ajax/get_datasets/'+ $('#agencies').val() + '/', function (data){
                 console.log(data);
                 populate_datasets(data);
@@ -204,6 +295,22 @@ Datasets Table
                 $('#output_uf').text(dataset_list[$(this).val()][0].update_frequency);
             }
         });
+
+        $('#fcc_get').click(function(){
+            $.get('https://geo.fcc.gov/api/census/area?lat='+$('#agency_lat').val()+'&lon='+$('#agency_lng').val()+'&format=json', function (data){
+                console.log(data);
+                $('#agency_fips').val(data.results[0].county_fips).trigger("input");
+            });
+        })
+
+        // agency details
+        $('#agency_lat').on('input', function(){$('#output_agency_lat').text($(this).val());});
+        $('#agency_lng').on('input', function(){$('#output_agency_lng').text($(this).val());});
+        $('#agency_type').change(function(){$('#output_agency_type').text($(this).val());});
+        $('#agency_city').on('input', function(){$('#output_agency_city').text($(this).val());});
+        $('#agency_state').change(function(){$('#output_agency_state').text($(this).val());});
+        $('#agency_zip').on('input', function(){$('#output_agency_zip').text($(this).val());});
+        $('#agency_fips').on('input', function(){$('#output_agency_fips').text($(this).val());});
 
         // new datasets will populate from dropdowns
         $('#data_types').change(function(){$('#output_dt').text($(this).val());});
