@@ -1,0 +1,8 @@
+from . import views
+from django.urls import path
+
+urlpatterns = [
+    path('', views.index),
+    path('ajax/get_agencies/<str:state_iso>/', views.get_agencies, name="state_iso"),
+    path('ajax/get_datasets/<str:id>/', views.get_datasets, name="id"),
+]
