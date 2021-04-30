@@ -133,9 +133,10 @@ Datasets Table
         $('#agencies').append('<option selected disabled> Choose an agency from '+$('#states').val()+'...</option>')
         // add the agencies to the drop down
         $.each(agencies, function(key, agency){
-            agency_list[agency.id] = agency;
+            id = (agency.pk).replace(/-/g, ""); //remove hyphens from UUID
+            agency_list[id] = agency;
             //console.log(agency);
-            $('#agencies').append('<option value="'+agency.id+'">'+agency.name+'</option>');
+            $('#agencies').append('<option value="'+id+'">'+agency.fields.name+'</option>');
         });  
     }
 
@@ -146,9 +147,9 @@ Datasets Table
         $('#datasets').append('<option value="new"> New Dataset </option>');
         // add the agencies to the drop down
         $.each(datasets, function(key, dataset){
-            dataset_list[dataset.id] = datasets;
-            //console.log(dataset);
-            $('#datasets').append('<option value="'+dataset.id+'">'+dataset.name+'</option>');
+            dataset_list[dataset.pk] = datasets;
+            console.log(dataset);
+            $('#datasets').append('<option value="'+dataset.pk+'">'+dataset.fields.name+'</option>');
         });  
         
         console.log(dataset_list);
@@ -167,7 +168,7 @@ Datasets Table
         $('#states').change(function(){
             
             $.get('ajax/get_agencies/'+ $('#states').val() + '/', function (data){
-                //console.log(data);
+                console.log(data);
                 populate_agencies(data);
                 
             });
