@@ -59,7 +59,7 @@ class Agency(models.Model):
 class Source_Type(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=50)
-    description = models.TextField()
+    description = models.TextField(null=True)
 
     class Meta:
         verbose_name_plural = "Source Types"
@@ -68,7 +68,7 @@ class Source_Type(models.Model):
 class Data_Type(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=50)
-    description = models.TextField()
+    description = models.TextField(null=True)
 
     class Meta:
         verbose_name_plural = "Data Types"
@@ -77,7 +77,7 @@ class Data_Type(models.Model):
 class Format_Type(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=50)
-    description = models.TextField()
+    description = models.TextField(null=True)
 
     class Meta:
         verbose_name_plural = "Format Types"
@@ -86,7 +86,7 @@ class Format_Type(models.Model):
 class Update_Frequency(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=50)
-    description = models.TextField()
+    description = models.TextField(null=True)
     class Meta:
         verbose_name_plural = "Update Frequencies"
 
@@ -94,7 +94,7 @@ class Update_Frequency(models.Model):
 class Scraper(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) 
     path = models.CharField(max_length=50)
-    description = models.TextField()
+    description = models.TextField(null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
 
@@ -103,7 +103,7 @@ class Scraper(models.Model):
 class Dataset(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     url = models.CharField(max_length=255, unique=True)
-    name = models.CharField(max_length=255)
+    name = models.TextField(null=True)
     source_type = models.ForeignKey(Source_Type, null=True, on_delete=models.SET_NULL)
     data_type = models.ForeignKey(Data_Type, null=True, on_delete=models.SET_NULL)
     format_type = models.ForeignKey(Format_Type, null=True, on_delete=models.SET_NULL)
@@ -111,6 +111,8 @@ class Dataset(models.Model):
     update_frequency = models.ForeignKey(Update_Frequency, null=True, on_delete=models.SET_NULL)
     portal_type = models.CharField(max_length=255, null=True)
     coverage_start = models.DateField(null=True)
-    scraper_id = models.ForeignKey(Scraper, null=True, on_delete=models.SET_NULL)
+    scraper = models.ForeignKey(Scraper, null=True, on_delete=models.SET_NULL)
+    can_scrape = models.BooleanField(default=1)
+    notes = models.TextField(null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)

@@ -3,6 +3,7 @@ from django.shortcuts import render
 from master.models import State, Data_Type, Format_Type, Source_Type, Update_Frequency, Agency_Type, Agency, Dataset
 from django.http import HttpResponse
 from django.core import serializers
+import json
 
 # Create your views here.
 def index(request):
@@ -30,4 +31,10 @@ def get_agencies(request, state_iso):
     return HttpResponse(data, content_type="application/json")
 
 def get_datasets(request, id):
-    return JsonResponse(Dataset(agency=id).objects.all(), safe=False)
+    # try and grab any available datasets using the ID
+    try:
+        data = serializers.serialize('json', Dataset.objects.all().filter(agency=id))
+    # no records found
+    except Dataset.DoesNotExist:
+        data = json.dumps({'msg': 'no datasets'})
+    return HttpResponse(data, content_type="application/json")
