@@ -258,12 +258,12 @@
             .val('')
             .prop('checked', false)
             .prop('selected', false);
-        $('#states').val($("#states option:first").val())
+        $('#states').val($("#states option:first").val()); // add the choose a state text back
         $('#new_dataset').hide();
         $('#agency-info').hide();
         $('#states').change(function(){
             
-            $.get('ajax/get_agencies/'+ $('#states').val() + '/', function (data){
+            $.get('/intake/ajax/get_agencies/'+ $('#states').val() + '/', function (data){
                 //console.log(data);
                 populate_agencies(data);
                 
@@ -282,7 +282,7 @@
             $('#agency_zip').val(agency_list[$('#agencies').val()].fields.zipcode).trigger("input");
             $('#agency_fips').val(agency_list[$('#agencies').val()].fields.county_fips).trigger("input");
             $('#output_agency_name').text($('#agencies option:selected').text());
-            $.get('ajax/get_datasets/'+ $('#agencies').val() + '/', function (data){
+            $.get('/intake/ajax/get_datasets/'+ $('#agencies').val() + '/', function (data){
                 console.log(data);
                 populate_datasets(data);
             });

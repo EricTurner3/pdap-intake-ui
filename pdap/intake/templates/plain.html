@@ -182,7 +182,7 @@ Datasets Table
         $('#new_dataset').hide();
         $('#states').change(function(){
             
-            $.get('ajax/get_agencies/'+ $('#states').val() + '/', function (data){
+            $.get('/intake/ajax/get_agencies/'+ $('#states').val() + '/', function (data){
                 console.log(data);
                 populate_agencies(data);
                 
@@ -194,7 +194,7 @@ Datasets Table
             console.log('Agency selected');
             $.ajax(
                 {
-                    url: 'ajax/get_datasets/'+ $('#agencies').val() + '/',
+                    url: '/intake/ajax/get_datasets/'+ $('#agencies').val() + '/',
                     success: function (data){
                         populate_datasets(data);
                     },

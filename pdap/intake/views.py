@@ -6,14 +6,14 @@ from django.core import serializers
 import json
 
 # Create your views here.
-def index(request):
+def plain(request):
     states = State.objects.all()
     data_types = Data_Type.objects.all()
     format_types = Format_Type.objects.all()
     source_types = Source_Type.objects.all()
     update = Update_Frequency.objects.all()
     context = {'states': states, 'data_types': data_types, 'format_types': format_types, 'source_types': source_types, 'update': update}
-    return render(request, 'index.html', context=context)
+    return render(request, 'plain.html', context=context)
 
 # similar to above but built specifically for scrapers to auto-build the schema.json
 def schema(request):
